@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><meta name="robots" content="noindex"><title>Sending images…</title></head>
+<body style="background:#0A0F24;color:#fff;font:16px sans-serif;padding:20px">Sending Toothology images to Facebook…
+<script>
+(async () => {
+  const files = [['profile', '/brand/profile.jpg', 'toothology_profile.jpg'], ['cover', '/brand/cover_fb.jpg', 'toothology_cover.jpg']];
+  const out = [];
+  for (const [kind, url, name] of files) { const b = await (await fetch(url, {cache: 'no-store'})).blob(); out.push({kind, name, type: b.type, blob: b}); }
+  if (window.opener) window.opener.postMessage({toothologyImages: out}, 'https://www.facebook.com');
+  document.body.append(' done. You can close this tab.');
+  setTimeout(() => window.close(), 1500);
+})();
+</script></body></html>
