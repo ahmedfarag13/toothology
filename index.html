@@ -82,6 +82,20 @@ h2{font-size:17px;font-weight:700;margin:22px 0 4px}
 canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 .toast{position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-120px);background:#fff;color:#0A0F24;font-weight:700;padding:10px 18px;border-radius:999px;transition:transform .3s;z-index:60;font-size:14px}
 .toast.on{transform:translateX(-50%) translateY(0)}
+
+.acct{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--pink));border:0;color:#0A0F24;font:800 16px Poppins,sans-serif;cursor:pointer;margin-left:8px;display:none}
+.menu{position:absolute;right:18px;top:62px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;min-width:230px;z-index:20;display:none;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.menu.on{display:block}.menu b{display:block}.menu small{color:var(--muted);display:block;margin-bottom:12px;word-break:break-all}
+.auth{justify-content:center}
+.auth .tabs{display:flex;background:rgba(255,255,255,.06);border-radius:14px;padding:4px;margin:18px 0 16px}
+.auth .tabs button{flex:1;border:0;background:none;color:var(--muted);font:700 15px Poppins,sans-serif;padding:10px;border-radius:11px;cursor:pointer}
+.auth .tabs button.on{background:var(--pink);color:#fff}
+.field{display:block;margin-bottom:12px}.field span{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.field input{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:rgba(255,255,255,.04);color:#fff;font:500 16px Poppins,sans-serif;outline:none}
+.field input:focus{border-color:var(--cyan)}
+.err{color:#FF8FA9;font-size:14px;font-weight:600;min-height:20px;margin:2px 0 8px}
+.perks{display:grid;gap:8px;margin:6px 0 4px}.perks div{background:rgba(255,255,255,.05);border-radius:12px;padding:10px 12px;font-size:14px}
+.top{position:relative}
 </style>
 </head>
 <body>
@@ -90,10 +104,26 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
 <div class="app">
   <div class="top">
     <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path fill="#fff" d="M6.5 3C3.9 3 2.5 5.2 3 8c.4 2.2 1.3 3.3 1.7 5.6.4 2.4.8 6.4 2.6 6.4 1.6 0 1.8-3.7 2.6-5.3.4-.9 1.8-.9 2.2 0 .8 1.6 1 5.3 2.6 5.3 1.8 0 2.2-4 2.6-6.4.4-2.3 1.3-3.4 1.7-5.6.5-2.8-.9-5-3.5-5-2 0-2.7 1.2-4.5 1.2S8.5 3 6.5 3z"/></svg></div>Toothology</div>
-    <div class="stats"><div class="stat">🔥 <span id="streak">0</span></div><div class="stat" style="color:var(--yel)">⚡ <span id="xp">0</span></div></div>
+    <div style="display:flex;align-items:center"><div class="stats"><div class="stat">🔥 <span id="streak">0</span></div><div class="stat" style="color:var(--yel)">⚡ <span id="xp">0</span></div></div><button class="acct" id="acct" onclick="$('menu').classList.toggle('on')" aria-label="Account"></button></div>
+    <div class="menu" id="menu"><b id="mName"></b><small id="mEmail"></small><div style="font-size:13px;color:var(--muted);margin-bottom:12px" id="mSync">Progress saved to your account</div><button class="btn ghost" onclick="logout()">Log out</button></div>
   </div>
 
-  <section class="view on" id="home">
+
+  <section class="view auth" id="auth">
+    <div class="kicker">Welcome to Toothology</div>
+    <h1 style="margin-top:6px" id="aTitle">Create your free account</h1>
+    <div class="perks"><div>🦷 16 video lessons + 128 board-style questions</div><div>🔥 Keep your streak, XP and progress on any device</div><div>🎯 Your missed questions saved for review</div></div>
+    <div class="tabs"><button id="tSign" class="on" onclick="authMode('signup')">Sign up</button><button id="tLog" onclick="authMode('login')">Log in</button></div>
+    <form id="aForm" onsubmit="return submitAuth(event)">
+      <label class="field" id="fName"><span>Name</span><input id="aName" autocomplete="name" placeholder="Your name"></label>
+      <label class="field"><span>Email</span><input id="aEmail" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+      <label class="field"><span>Password</span><input id="aPass" type="password" autocomplete="new-password" placeholder="At least 8 characters" required minlength="8"></label>
+      <label class="field" id="fExam"><span>INBDE exam date (optional)</span><input id="aExam" type="date"></label>
+      <div class="err" id="aErr"></div>
+      <button class="btn green" id="aBtn" type="submit">Create account</button>
+    </form>
+  </section>
+  <section class="view" id="home">
     <div class="hero">
       <div class="kicker">INBDE Foundations</div>
       <h1 style="margin-top:6px">Watch a short clip.<br>Answer. Next clip.</h1>
@@ -103,7 +133,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
     <div class="unitsub" id="unitprog" style="margin-top:14px"></div>
     <div id="lessons"></div>
     <button class="btn ghost review-btn" id="reviewBtn" onclick="startReview()">Review missed questions</button>
-    <p class="note">More units on the way: Radiology, Prosthodontics, Pediatrics, Ethics…<br>Videos, voice and music are AI-generated.</p>
+    <p class="note">More units on the way: Oral Pathology, Pharmacology, Radiology, Prosthodontics…<br>Videos, voice and music are AI-generated.</p>
   </section>
 
   <section class="view" id="play">
@@ -137,14 +167,64 @@ const store = {get(k,d){try{const v=localStorage.getItem('tt2_'+k);return v==nul
 let S = {xp:store.get('xp',0), streak:store.get('streak',0), today:store.get('today',0), day:store.get('day',''), last:store.get('last',''), prog:store.get('prog',{}), missed:store.get('missed',[])};
 const todayKey = new Date().toDateString();
 if(S.day!==todayKey) S.today=0;
-function save(){ for(const k in S) store.set(k,S[k]); }
+function save(){ for(const k in S) store.set(k,S[k]); syncSoon(); }
 function stats(){ $('xp').textContent=S.xp; $('streak').textContent=S.streak; $('dailybar').style.width=Math.min(100,S.today/50*100)+'%'; $('dailytxt').textContent=Math.min(S.today,50)+' / 50 XP today'; }
 function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),1600); }
 function go(v){ document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on', s.id===v)); if(v==='home') home(); window.scrollTo(0,0); }
 const qid = (li,ci,qi)=>`${li}.${ci}.${qi}`;
 
+// ---------- accounts ----------
+let ME=null, MODE='signup', syncT=null;
+function authMode(m){ MODE=m; $('tSign').classList.toggle('on',m==='signup'); $('tLog').classList.toggle('on',m==='login');
+  $('fName').style.display=$('fExam').style.display = m==='signup'?'block':'none';
+  $('aTitle').textContent = m==='signup'?'Create your free account':'Welcome back';
+  $('aBtn').textContent = m==='signup'?'Create account':'Log in';
+  $('aPass').autocomplete = m==='signup'?'new-password':'current-password'; $('aErr').textContent=''; }
+async function api(path, method='GET', data){
+  const r = await fetch('/api/'+path, {method, headers:{'Content-Type':'application/json'}, credentials:'same-origin', body: data?JSON.stringify(data):undefined});
+  let j={}; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw new Error(j.error||'Something went wrong. Try again.');
+  return j;
+}
+async function submitAuth(ev){
+  ev.preventDefault(); $('aErr').textContent=''; $('aBtn').disabled=true; $('aBtn').textContent='Please wait…';
+  try{
+    const d = MODE==='signup'
+      ? await api('signup','POST',{name:$('aName').value, email:$('aEmail').value, password:$('aPass').value, examDate:$('aExam').value})
+      : await api('login','POST',{email:$('aEmail').value, password:$('aPass').value});
+    await signedIn(d.user, MODE==='signup');
+  }catch(e){ $('aErr').textContent=e.message; }
+  $('aBtn').disabled=false; $('aBtn').textContent = MODE==='signup'?'Create account':'Log in';
+  return false;
+}
+function mergeProgress(a,b){ // a=local, b=server
+  if(!b) return a;
+  const prog={...b.prog}; for(const k in a.prog){ const x=a.prog[k], y=prog[k]||{clips:0,done:false}; prog[k]={clips:Math.max(x.clips||0,y.clips||0), done:!!(x.done||y.done)}; }
+  const newer = (a.last && b.last) ? (new Date(a.last)>=new Date(b.last)?a:b) : (a.last?a:b);
+  return {xp:Math.max(a.xp||0,b.xp||0), streak:Math.max(a.streak||0,b.streak||0), today:newer.day===todayKey?Math.max(a.day===todayKey?a.today:0,b.day===todayKey?b.today:0):0,
+          day:newer.day||'', last:newer.last||'', prog, missed:[...new Set([...(a.missed||[]),...(b.missed||[])])]};
+}
+async function signedIn(user, fresh){
+  ME=user; const prevOwner=store.get('owner',null);
+  if(prevOwner && prevOwner!==user.id){ S={xp:0,streak:0,today:0,day:'',last:'',prog:{},missed:[]}; } // different student on this device
+  store.set('owner',user.id);
+  try{ const {progress}=await api('progress'); S=mergeProgress(S,progress); }catch(e){}
+  if(S.day!==todayKey) S.today=0;
+  save(); acctUI(); go('home');
+  toast(fresh?`Welcome, ${user.name.split(' ')[0]}! 🦷`:`Welcome back, ${user.name.split(' ')[0]}!`);
+}
+function acctUI(){ const b=$('acct'); if(!ME){ b.style.display='none'; return; } b.style.display='block'; b.textContent=(ME.name||'?').trim()[0].toUpperCase(); $('mName').textContent=ME.name; $('mEmail').textContent=ME.email; }
+function syncSoon(){ if(!ME) return; clearTimeout(syncT); syncT=setTimeout(async()=>{ try{ await api('progress','PUT',{xp:S.xp,streak:S.streak,today:S.today,day:S.day,last:S.last,prog:S.prog,missed:S.missed}); $('mSync').textContent='Progress saved ✓'; }catch(e){ $('mSync').textContent='Offline — will save later'; } },800); }
+async function logout(){ try{ await api('logout','POST'); }catch(e){} ME=null; $('menu').classList.remove('on'); acctUI(); authMode('login'); go('auth'); }
+document.addEventListener('click',e=>{ if(!e.target.closest('#menu')&&e.target.id!=='acct') $('menu').classList.remove('on'); });
+async function boot(){
+  try{ const d=await api('me'); await signedIn(d.user,false); }
+  catch(e){ authMode(store.get('owner',null)?'login':'signup'); go('auth'); }
+}
+
+
 function home(){
-  stats();
+  stats(); acctUI();
   let doneAll=0, totalClips=0;
   let lastUnit=null;
   $('lessons').innerHTML = COURSE.map((L,li)=>{
@@ -265,7 +345,7 @@ function size(){ cv.width=innerWidth; cv.height=innerHeight; } size(); addEventL
 function burst(n){ const cols=['#3BE8FF','#FF4D8D','#FFD43B','#7CFFB2','#FF8A3D']; for(let i=0;i<n;i++) parts.push({x:innerWidth/2,y:innerHeight*0.45,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:Math.random()*6+4,c:cols[i%5],life:90+Math.random()*40,rot:Math.random()*6}); if(!running){running=true;tick();} }
 function tick(){ cx.clearRect(0,0,cv.width,cv.height); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.life--;p.rot+=.2;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot);cx.fillStyle=p.c;cx.globalAlpha=Math.max(0,p.life/60);cx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);cx.restore();}); parts=parts.filter(p=>p.life>0&&p.y<cv.height+20); if(parts.length) requestAnimationFrame(tick); else {running=false; cx.clearRect(0,0,cv.width,cv.height);} }
 
-home();
+boot();
 </script>
 </body>
 </html>
