@@ -1,12 +1,14 @@
-<!DOCTYPE html><html><head><meta name="robots" content="noindex"><title>Sending images…</title></head>
-<body style="background:#0A0F24;color:#fff;font:16px sans-serif;padding:20px">Sending Toothology images to Facebook…
+<!DOCTYPE html><html><head><meta name="robots" content="noindex"><title>Sending…</title></head>
+<body style="background:#0A0F24;color:#fff;font:16px sans-serif;padding:20px">Sending Toothology files to Facebook…
 <script>
 (async () => {
-  const files = [['profile', '/brand/profile.jpg', 'toothology_profile.jpg'], ['cover', '/brand/cover_fb.jpg', 'toothology_cover.jpg']];
+  const q = new URLSearchParams(location.search).get('f');
+  const list = q ? q.split(',').map(p => ['file', '/brand/' + p, p.split('/').pop()]) :
+    [['profile', '/brand/profile.jpg', 'toothology_profile.jpg'], ['cover', '/brand/cover_fb.jpg', 'toothology_cover.jpg']];
   const out = [];
-  for (const [kind, url, name] of files) { const b = await (await fetch(url, {cache: 'no-store'})).blob(); out.push({kind, name, type: b.type, blob: b}); }
+  for (const [kind, url, name] of list) { const b = await (await fetch(url, {cache: 'no-store'})).blob(); out.push({kind, name, type: b.type || 'video/mp4', blob: b}); }
   if (window.opener) window.opener.postMessage({toothologyImages: out}, 'https://www.facebook.com');
-  document.body.append(' done. You can close this tab.');
+  document.body.append(' done.');
   setTimeout(() => window.close(), 1500);
 })();
 </script></body></html>
