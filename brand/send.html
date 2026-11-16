@@ -7,7 +7,7 @@
     [['profile', '/brand/profile.jpg', 'toothology_profile.jpg'], ['cover', '/brand/cover_fb.jpg', 'toothology_cover.jpg']];
   const out = [];
   for (const [kind, url, name] of list) { const b = await (await fetch(url, {cache: 'no-store'})).blob(); out.push({kind, name, type: b.type || 'video/mp4', blob: b}); }
-  if (window.opener) window.opener.postMessage({toothologyImages: out}, 'https://www.facebook.com');
+  if (window.opener) window.opener.postMessage({toothologyImages: out}, new URLSearchParams(location.search).get('to') || 'https://www.facebook.com');
   document.body.append(' done.');
   setTimeout(() => window.close(), 1500);
 })();
